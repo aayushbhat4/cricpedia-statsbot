@@ -15,6 +15,11 @@ data/csv_T20Is_male
 data/names.csv
 data/cricket_grounds.csv
 data/people.csv
+data/master_df_odis_male.csv
+data/master_df_tests_male.csv
+data/csv_Tests_male
+data/csv_multiday_matches
+data/csv_ODIs_male
 
 stat-testing.ipynb
 .streamlit/secrets.toml

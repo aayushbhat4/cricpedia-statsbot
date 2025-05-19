@@ -8,9 +8,9 @@ from llm_tools import dispatch, function_schemas
 
 # 1. Config & data
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPEN_API_KEY"))
-data = pd.read_csv("data/master_df_T20Is_male.csv", low_memory=False)
-data['start_date'] = pd.to_datetime(data['start_date'])
+client = OpenAI(api_key=os.getenv("OPEN_API_KEY_v2"))
+paths = {'T20I':"data/master_df_T20Is_male.csv", 'ODI':"data/master_df_odis_male.csv", 'Test':"data/master_df_tests_male.csv"}
+
 
 st.set_page_config(layout="wide")
 st.title("🏏 Cricket Stats Assistant")
@@ -56,6 +56,9 @@ with col1:
             if resp.function_call:
                 name = resp.function_call.name
                 args = json.loads(resp.function_call.arguments)
+                print(f"Function call: {name} with args: {args}")
+                data = pd.read_csv(paths[args['format']], low_memory=False)
+                data['start_date'] = pd.to_datetime(data['start_date'])
                 result = dispatch(name, args, data)
                 df = pd.DataFrame(result)
 
@@ -63,7 +66,7 @@ with col1:
                 st.session_state.last_df = df
 
                 # Append only a textual summary into history
-                summary = f"Here are the top {len(df)} rows from `{name}`."
+                summary = f"Here are the top {len(df)} rows from {name}."
                 st.session_state.history.append(("assistant", summary))
 
                 # Append function result back into messages for the wrap-up call
@@ -75,7 +78,7 @@ with col1:
 
                 # Final wrap-up from the assistant
                 wrap = client.chat.completions.create(
-                    model="gpt-4o-mini",
+                    model="gpt-4.1-mini",
                     messages=messages,
                     temperature=0.2,
                     max_tokens=300
